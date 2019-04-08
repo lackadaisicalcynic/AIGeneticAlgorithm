@@ -2,10 +2,9 @@ from PIL import Image, ImageDraw
 import random
 WIDTH = 512
 HEIGHT = 512
-CIRCLES_AMOUNT = 700
-N_OF_GENERATION = 20000
-MAX_RADIUS = 13
-
+CIRCLES_AMOUNT = 1000
+MAX_RADIUS = 12
+N_OF_GENERATION = int(input("Enter number of iterations(~20k recommended, it will take 10-20 minutes)"))
 
 def fitness_function(sketch, origin, lower_x, lower_y, upper_x, upper_y):
     if lower_x < 0:
@@ -21,6 +20,10 @@ def fitness_function(sketch, origin, lower_x, lower_y, upper_x, upper_y):
         for j in range(lower_y, upper_y):
             temp1 = sketch.getpixel((i, j))
             temp2 = origin.getpixel((i, j))
+            a = 0
+            if type(temp2) == type(a):
+                temp2 = (temp2, temp2, temp2)
+
             square_difference += (temp1[0] - temp2[0]) ** 2 + (temp1[1] - temp2[1]) ** 2 + (temp1[2] - temp2[2]) ** 2
     return square_difference
 
@@ -41,7 +44,7 @@ def annealing(mid, min, max, i):
     return lower, upper
 
 
-origin = Image.open("sample12.jpg")
+origin = Image.open("resources/sample16.tiff")
 
 sketch = Image.new("RGB", (WIDTH, HEIGHT), "#000000")
 draw = ImageDraw.Draw(sketch)
@@ -51,7 +54,7 @@ circles = []
 for i in range(CIRCLES_AMOUNT):
     first_point_x = random.randint(-1 * MAX_RADIUS, WIDTH)
     first_point_y = random.randint(-1 * MAX_RADIUS, HEIGHT)
-    radius = random.randint(10, MAX_RADIUS)
+    radius = random.randint(8, MAX_RADIUS)
 
     circles.append([first_point_x, first_point_y, radius, "#000000"])
 
@@ -112,6 +115,6 @@ for i in range(N_OF_GENERATION):
     else:
         fitness = fitness + new_fitness - old_fitness
 
-    if i % 20 == 0:
+    if (i+1) % 100 == 0:
         sketch.save("output.png")
-        print("Mutation number:" + str(i))
+        print("Mutation number:" + str(i+1))
